@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Targeting Foundation — 2-Modul Imtihoni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C1C21; --charcoal:#232328; --panel:#2C2C33; --panel-2:#33333B;
+    --line:#3F3F49; --ivory:#F3EFE6; --muted:#A29E96;
+    --gold:#C9A227; --gold-soft:#EBD173;
+    --swan:#3D77E0; --swan-soft:#7FA8F0; --red:#E4573D;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--charcoal);color:var(--ivory);font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(1000px 500px at 90% -15%, rgba(201,162,39,.09), transparent 60%),
+               radial-gradient(800px 500px at -15% 115%, rgba(61,119,224,.08), transparent 60%);}
+  .wrap{width:100%;max-width:800px;margin:0 auto;padding:26px 20px 40px;flex:1;position:relative;z-index:1}
+
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+  .brand{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;line-height:1.05}
+  .brand .l2{display:block;font-style:italic;font-weight:700;background:linear-gradient(100deg,#7d6210,var(--gold) 40%,var(--gold-soft) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .modul{font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);padding-top:6px}
+
+  .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.8rem;color:var(--muted)}
+  .meta .qcount{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ivory)}
+  .meta .qcount span{color:var(--gold)}
+  .lake{position:relative;height:30px;margin-bottom:24px}
+  .lake .bar{position:absolute;left:0;right:0;bottom:6px;height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+  .lake .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-soft));transition:width .5s cubic-bezier(.6,0,.2,1)}
+  .lake .glider{position:absolute;bottom:2px;left:0;width:30px;height:30px;margin-left:-15px;transition:left .5s cubic-bezier(.6,0,.2,1);filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:36px 32px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  @media(max-width:540px){.card{padding:26px 20px}}
+  .anim{animation:rise .45s cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+  .topic-tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);border:1px solid rgba(201,162,39,.45);border-radius:99px;padding:6px 14px;margin-bottom:18px}
+  .qtop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:0}
+  .qtop .topic-tag{margin-bottom:18px}
+  .qtimer{display:flex;align-items:center;gap:5px;font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;padding:6px 14px;border-radius:99px;border:1px solid var(--line);color:var(--ivory);white-space:nowrap;transition:border-color .2s,color .2s,background .2s;margin-bottom:18px}
+  .qtimer.warn{color:#F08A76;border-color:rgba(228,87,61,.55);background:rgba(228,87,61,.1);animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.55}}
+  .question{font-family:'Playfair Display',serif;font-weight:700;font-size:1.4rem;line-height:1.42;margin-bottom:26px}
+  @media(max-width:540px){.question{font-size:1.18rem}}
+
+  .opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:11px;color:var(--ivory);font-family:'Manrope',sans-serif;font-size:.96rem;font-weight:500;line-height:1.5;cursor:pointer;transition:border-color .15s,transform .15s,background .15s}
+  .opt:hover{border-color:var(--gold);transform:translateX(4px)}
+  .opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .opt .key{flex:0 0 30px;height:30px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:800;color:var(--muted);transition:all .15s}
+  .opt.sel{border-color:var(--gold);background:rgba(201,162,39,.1)}
+  .opt.sel .key{background:linear-gradient(120deg,var(--gold),var(--gold-soft));border-color:var(--gold);color:var(--ink)}
+
+  .actions{display:flex;justify-content:flex-end;margin-top:24px;gap:12px;flex-wrap:wrap}
+  .btn{font-family:'Manrope',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.04em;border:none;border-radius:11px;padding:15px 32px;cursor:pointer;transition:transform .12s,opacity .15s,box-shadow .2s}
+  .btn:active{transform:scale(.97)}
+  .btn-gold{background:linear-gradient(100deg,var(--gold),var(--gold-soft));color:var(--ink);box-shadow:0 6px 20px rgba(201,162,39,.25)}
+  .btn-gold:hover{box-shadow:0 8px 26px rgba(201,162,39,.4)}
+  .btn-gold[disabled]{opacity:.3;cursor:not-allowed;box-shadow:none}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ivory)}
+  .btn-ghost:hover{border-color:var(--gold)}
+  .btn-danger{background:transparent;border:1px solid rgba(228,87,61,.5);color:#F08A76}
+  .btn-sm{padding:9px 16px;font-size:.78rem;border-radius:9px}
+
+  /* start */
+  .start .swanhero{width:74px;height:74px;margin-bottom:18px;animation:float 4s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-7px)}}
+  .start h1{font-family:'Playfair Display',serif;font-weight:900;font-size:2.5rem;line-height:1.12;margin-bottom:16px}
+  @media(max-width:540px){.start h1{font-size:1.9rem}}
+  .start h1 em{font-style:italic;font-weight:700;background:linear-gradient(100deg,#7d6210,var(--gold) 40%,var(--gold-soft));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .start .lead{color:var(--muted);font-size:.96rem;line-height:1.7}
+  .rules{margin:24px 0 26px;border-top:1px solid var(--line)}
+  .rules li{display:flex;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);font-size:.9rem;line-height:1.55;list-style:none}
+  .rules b{color:var(--gold);font-family:'Playfair Display',serif;font-size:1.15rem;flex:0 0 52px;text-align:right}
+  .field{margin-bottom:20px}
+  .field label{display:block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .field input{width:100%;background:var(--charcoal);border:1px solid var(--line);border-radius:11px;padding:15px 16px;color:var(--ivory);font-family:'Manrope',sans-serif;font-size:1rem}
+  .field input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
+  .hint{font-size:.78rem;color:var(--muted);line-height:1.5}
+
+  /* camera */
+  .cam{border:1px dashed var(--line);border-radius:14px;padding:18px;margin-bottom:22px}
+  .cam h4{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .camstage{position:relative;width:100%;max-width:340px;aspect-ratio:4/3;background:var(--charcoal);border-radius:12px;overflow:hidden;margin-bottom:12px}
+  .camstage video,.camstage img{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+  .camstage .frame{position:absolute;inset:10px;border:2px solid rgba(201,162,39,.6);border-radius:10px;pointer-events:none}
+  .camstage .idle{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem}
+  .camstage .idle svg{width:38px;height:38px;opacity:.6}
+  .cam .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .cam .status{font-size:.8rem}
+  .cam .status.ok{color:#8FD6A8}
+  .cam .status.err{color:#F08A76}
+  .start .actions{justify-content:space-between;align-items:center}
+
+  /* result */
+  .verdict-head{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .verdict-swan{width:88px;height:88px;flex:0 0 auto}
+  .verdict-photo{width:88px;height:88px;border-radius:14px;object-fit:cover;border:2px solid var(--line);transform:scaleX(-1)}
+  .verdict-tag{display:inline-block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;padding:6px 15px;border-radius:99px;margin-bottom:12px;font-weight:800}
+  .v-pass{background:rgba(61,119,224,.15);color:var(--swan-soft);border:1px solid rgba(61,119,224,.5)}
+  .v-retry{background:rgba(201,162,39,.13);color:var(--gold-soft);border:1px solid rgba(201,162,39,.5)}
+  .v-fail{background:rgba(228,87,61,.13);color:#F08A76;border:1px solid rgba(228,87,61,.5)}
+  .score{font-family:'Playfair Display',serif;font-weight:900;font-size:4.6rem;line-height:1}
+  .score small{font-size:1.7rem;color:var(--muted);font-weight:500}
+  .verdict-title{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;margin:18px 0 8px}
+  .verdict-text{color:var(--muted);font-size:.95rem;line-height:1.7;max-width:56ch}
+  .savestat{margin-top:14px;font-size:.82rem;font-weight:600}
+  .savestat.ok{color:#8FD6A8}.savestat.err{color:#F08A76}
+  .divider{border:none;border-top:1px solid var(--line);margin:28px 0}
+  .breakdown h3,.review h3{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  .brow{margin-bottom:15px}
+  .brow .lbl{display:flex;justify-content:space-between;font-size:.87rem;margin-bottom:6px;font-weight:600}
+  .brow .lbl span:last-child{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:500}
+  .brow .track{height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+  .brow .track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));width:0;transition:width 1s cubic-bezier(.2,.7,.3,1)}
+  .ritem{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:var(--panel-2)}
+  .ritem .rq{font-weight:700;font-size:.93rem;line-height:1.5;margin-bottom:10px}
+  .ritem .ra{font-size:.86rem;line-height:1.55;margin-bottom:4px}
+  .ritem .ra.wrong{color:#F08A76}
+  .ritem .ra.right{color:#8FD6A8}
+  .ritem .rx{font-size:.83rem;line-height:1.6;color:var(--muted);margin-top:9px;border-top:1px dashed var(--line);padding-top:9px}
+  .allright{color:var(--muted);font-size:.9rem}
+  .result-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+
+  /* teacher */
+  footer{text-align:center;padding:10px 0 30px;position:relative;z-index:1}
+  footer button{background:none;border:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;opacity:.55}
+  footer button:hover{opacity:1;color:var(--gold)}
+  .tpanel h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;margin-bottom:6px}
+  .tpanel .sub{color:var(--muted);font-size:.88rem;margin-bottom:22px}
+  .trow{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--panel-2);flex-wrap:wrap}
+  .trow img{width:56px;height:56px;border-radius:10px;object-fit:cover;transform:scaleX(-1);border:1px solid var(--line)}
+  .trow .nophoto{width:56px;height:56px;border-radius:10px;background:var(--charcoal);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#F08A76;text-align:center;border:1px dashed rgba(228,87,61,.5);padding:4px}
+  .trow .info{flex:1;min-width:150px}
+  .trow .nm{font-weight:800;font-size:.95rem}
+  .trow .dt{font-size:.75rem;color:var(--muted);margin-top:2px}
+  .trow .pc{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;min-width:70px;text-align:right}
+  .trow .vt{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;padding:5px 10px;border-radius:99px}
+  .tstats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+  .tstat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;background:var(--panel-2)}
+  .tstat .n{font-family:'Playfair Display',serif;font-weight:900;font-size:1.7rem}
+  .tstat .l{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .tempty{color:var(--muted);font-size:.9rem;padding:20px 0}
+
+  .hidden{display:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Targeting<span class="l2">Foundation</span></div>
+    <div class="modul">2-modul · Yakuniy imtihon</div>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="card start anim">
+    <svg class="swanhero" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <path d="M46 10c-6 0-9 5-9 10 0 7 5 10 5 16 0 5-4 9-11 9-8 0-13-5-15-9-1 6 2 18 18 18 14 0 22-9 22-20h-8c-3 0-5-2-5-5 0-4 4-4 4-9 0-6-1-10-1-10z" fill="url(#gswan)"/>
+      <circle cx="45.4" cy="14.6" r="1.4" fill="#232328"/>
+      <defs><linearGradient id="gswan" x1="12" y1="54" x2="52" y2="10" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#1D4E9E"/><stop offset="1" stop-color="#7FA8F0"/>
+      </linearGradient></defs>
+    </svg>
+    <h1>Siz ko'k oqqushmisiz<br>yoki <em>qizilmi?</em></h1>
+    <p class="lead">2-modul yakunlandi. Endi raqamlar gapiradi: Salbiyni hisoblash · KPI metrikalar · Ta'qib qilish · Boshlang'ich holatni boshqarish · Targetologning kunlik faoliyati.</p>
+    <ul class="rules">
+      <li><b>40</b><span>ta savol — kattaroq savollar to'plamidan har safar tasodifiy tanlanadi, har biri 1 ball. Hisob-kitob savollarida kalkulyator ishlatish mumkin.</span></li>
+      <li><b>⏱ 90s</b><span>— har bir savolga 90 soniya beriladi va vaqt teskari sanaladi. Vaqt nolga yetsa, savol avtomatik yopiladi va <b style="font-size:.9rem">«javob berilmadi»</b> deb hisoblanadi — orqaga qaytib bo'lmaydi.</span></li>
+      <li><b>80%+</b><span>keyingi modulga o'tasiz · <b style="font-size:.9rem">50–79%</b> qayta imtihon · <b style="font-size:.9rem">&lt;50%</b> kurs bilan xayrlashasiz.</span></li>
+      <li><b>⟶</b><span>Orqaga qaytish yo'q. «Keyingi» bosilgach yoki vaqt tugasa javob qulflanadi — xuddi realdagi kabi: sarflangan byudjet ortga qaytmaydi.</span></li>
+      <li><b>📷</b><span>Imtihondan oldin rasmga tushasiz. Ismingiz, rasmingiz va natijangiz xavfsiz saqlanadi va faqat parol bilan himoyalangan o'qituvchi paneliga yuboriladi — boshqa birov nomidan topshirib bo'lmaydi.</span></li>
+      <li><b>🔒</b><span>Ism bo'yicha bir marta imtihon topshirgan odam <b style="font-size:.9rem">qayta kira olmaydi</b> — hatto boshqa qurilma yoki brauzerdan ham. Qayta topshirish faqat o'qituvchi tomonidan ruxsat berilgandagina mumkin.</span></li>
+    </ul>
+    <div class="field">
+      <label for="name">Ism va familiyangiz</label>
+      <input id="name" type="text" placeholder="Masalan: Aziz Karimov" autocomplete="off">
+    </div>
+    <div class="cam">
+      <h4>Shaxsni tasdiqlash — rasmga tushing</h4>
+      <div class="camstage" id="camStage">
+        <div class="idle" id="camIdle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h2l2-3h8l2 3h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Kamera hali yoqilmagan</span>
+        </div>
+        <video id="camVideo" class="hidden" autoplay playsinline muted></video>
+        <img id="camShot" class="hidden" alt="Sizning rasmingiz">
+        <div class="frame"></div>
+      </div>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" id="camOn">Kamerani yoqish</button>
+        <button class="btn btn-gold btn-sm hidden" id="camSnap">📷 Rasmga olish</button>
+        <button class="btn btn-ghost btn-sm hidden" id="camRetake">Qayta olish</button>
+        <span class="status" id="camStatus"></span>
+      </div>
+    </div>
+    <div id="startErr" class="hint" style="color:#F08A76;font-weight:700;margin-bottom:14px;display:none"></div>
+    <div class="actions">
+      <span class="hint">Savollar va variantlar har safar aralashtiriladi.<br>Natijangiz va rasmingiz faqat o'qituvchi paneliga yuboriladi.</span>
+      <button class="btn btn-gold" id="startBtn" disabled>Imtihonni boshlash</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <div class="meta">
+      <div class="qcount">Savol <span id="qNow">1</span> / <span id="qTotal">40</span></div>
+      <div class="hint" id="quizName"></div>
+    </div>
+    <div class="lake">
+      <div class="bar"><i id="barFill"></i></div>
+      <svg class="glider" id="glider" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <path d="M46 10c-6 0-9 5-9 10 0 7 5 10 5 16 0 5-4 9-11 9-8 0-13-5-15-9-1 6 2 18 18 18 14 0 22-9 22-20h-8c-3 0-5-2-5-5 0-4 4-4 4-9 0-6-1-10-1-10z" fill="url(#gswan2)"/>
+        <circle cx="45.4" cy="14.6" r="1.4" fill="#232328"/>
+        <defs><linearGradient id="gswan2" x1="12" y1="54" x2="52" y2="10" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#C9A227"/><stop offset="1" stop-color="#EBD173"/>
+        </linearGradient></defs>
+      </svg>
+    </div>
+    <div class="card" id="qCard">
+      <div class="qtop">
+        <div class="topic-tag" id="qTopic"></div>
+        <div class="qtimer" id="qTimer">⏱ <span id="qTimerNum">90</span>s</div>
+      </div>
+      <div class="question" id="qText"></div>
+      <div id="qOpts"></div>
+      <div class="actions">
+        <button class="btn btn-gold" id="nextBtn" disabled>Keyingi savol</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="card hidden">
+    <div class="verdict-head">
+      <img id="resPhoto" class="verdict-photo hidden" alt="">
+      <svg class="verdict-swan" id="resSwan" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <path id="vSwanPath" d="M46 10c-6 0-9 5-9 10 0 7 5 10 5 16 0 5-4 9-11 9-8 0-13-5-15-9-1 6 2 18 18 18 14 0 22-9 22-20h-8c-3 0-5-2-5-5 0-4 4-4 4-9 0-6-1-10-1-10z" fill="#3D77E0"/>
+        <circle cx="45.4" cy="14.6" r="1.4" fill="#232328"/>
+      </svg>
+      <div>
+        <div id="verdictTag" class="verdict-tag"></div>
+        <div class="score"><span id="scorePct">0</span><small>%</small></div>
+        <div class="hint" id="scoreRaw"></div>
+      </div>
+    </div>
+    <div class="verdict-title" id="verdictTitle"></div>
+    <p class="verdict-text" id="verdictText"></p>
+    <div class="savestat" id="saveStat"></div>
+    <hr class="divider">
+    <div class="breakdown">
+      <h3>Mavzular kesimida</h3>
+      <div id="breakRows"></div>
+    </div>
+    <hr class="divider">
+    <div class="review">
+      <h3>Xatolar tahlili</h3>
+      <div id="reviewList"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn btn-ghost" id="printBtn">Natijani chop etish</button>
+    </div>
+  </section>
+
+  <!-- TEACHER LOGIN -->
+  <section id="tlogin" class="card hidden">
+    <h2 class="verdict-title" style="margin-top:0">O'qituvchi paneli</h2>
+    <p class="hint" style="margin-bottom:18px">Bu bo'lim faqat kurs ustozi uchun.</p>
+    <div class="field">
+      <label for="tpin">Parol</label>
+      <input id="tpin" type="password" placeholder="••••••••" autocomplete="off">
+    </div>
+    <div class="actions" style="justify-content:space-between">
+      <button class="btn btn-ghost" id="tBack">← Orqaga</button>
+      <button class="btn btn-gold" id="tEnter">Kirish</button>
+    </div>
+  </section>
+
+  <!-- TEACHER PANEL -->
+  <section id="tpanel" class="card tpanel hidden">
+    <h2>O'quvchilar natijalari</h2>
+    <p class="sub">2-modul yakuniy imtihoni · natijalar yangisidan eskisiga tartiblangan</p>
+    <div class="tstats" id="tStats"></div>
+    <div id="tList"><p class="tempty">Yuklanmoqda…</p></div>
+    <div class="result-actions">
+      <button class="btn btn-ghost" id="tRefresh">Yangilash</button>
+      <button class="btn btn-danger" id="tClear">Barcha natijalarni o'chirish</button>
+      <button class="btn btn-ghost" id="tExit">Chiqish</button>
+    </div>
+  </section>
+</div>
+
+<footer><button id="teacherLink">O'qituvchi paneli</button></footer>
+
+<!-- ======= FIREBASE (natijalarni saqlash uchun) ======= -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   BU YERGA O'ZINGIZNING FIREBASE KONFIGURATSIYANGIZNI QO'YING
+   (Firebase Console → Project settings → Your apps → SDK config)
+   ============================================================ */
+var firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+var db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch(e) {
+  console.error("Firebase ishga tushmadi:", e);
+}
+</script>
+
+<script>
+/* ======= SOZLAMALAR ======= */
+var TEACHER_PIN = "oqqush2025"; // <<< O'qituvchi paroli — xohlasangiz shu yerda o'zgartiring
+
+var TOPICS = {
+  salbiy: "Salbiy va byudjet",
+  kpi: "KPI metrikalar",
+  taqib: "Ta'qib qilish",
+  kunlik: "Kunlik faoliyat",
+  boshqaruv: "Boshlang'ich holatni boshqarish"
+};
+
+var QUESTIONS = [
+  /* ——— Salbiy va byudjet (10) ——— */
+  {t:"salbiy", q:"Targetga $300 sarflab, $1,500 lik sotuv qildingiz. Topilgan $1,500 nima deb ataladi?",
+   o:["Ijobiy","Salbiy","ROAS","Marja"], c:0,
+   x:"Daromadli target orqali topilgan pul — ijobiy."},
+  {t:"salbiy", q:"$200 sarfladingiz — birorta ham sotuv bo'lmadi. Yo'qotilgan bu pul nima?",
+   o:["Salbiy","Ijobiy","Test byudjeti","CAC"], c:0,
+   x:"Zararga ishlagan reklamaga sarflangan/yo'qotilgan pul — salbiy."},
+  {t:"salbiy", q:"Reklamangiz yaxshi natija berdimi yoki yo'qmi — har ikki holatda ham nima bo'ladi?",
+   o:["Baribir pul to'laymiz","Faqat natija bo'lsa to'laymiz","Facebook pulni qaytaradi","Byudjet muzlatiladi"], c:0,
+   x:"Target reklamada natijadan qat'iy nazar biz baribir pul to'laymiz. Shuning uchun salbiyni bilish shart."},
+  {t:"salbiy", q:"Test uchun minimum byudjet qancha?",
+   o:["$200","$50","$500","$1,000"], c:0,
+   x:"Minimum $200. To'g'ri kombinatsiyalarni topish uchun $200–$400 sarflanadi."},
+  {t:"salbiy", q:"Kunlik byudjetni topish uchun yo'qotishga tayyor pulingizni necha kunga bo'lasiz?",
+   o:["14 kunga","7 kunga","30 kunga","4 kunga"], c:0,
+   x:"Bemalol yo'qotishga tayyor pul 14 kunga bo'linadi — bu kunlik byudjetingiz."},
+  {t:"salbiy", q:"Kunlik byudjet × 14 kun daromadsiz reklama. Bu qaysi nuqta?",
+   o:["Stop — barcha reklamalarni to'xtatish nuqtasi","Break-even nuqtasi","Xulosa kuni","Masshtablash nuqtasi"], c:0,
+   x:"Salbiy chegaraga yetdingiz — Stop. Barcha reklamalar to'xtatiladi."},
+  {t:"salbiy", q:"Pul topishdan oldin nimaga to'liq tayyor bo'lishingiz lozim?",
+   o:["Riskdagi pulni yo'qotishga","Kredit olishga","Byudjetni 2 baravar oshirishga","Akkauntni almashtirishga"], c:0,
+   x:"Har doim qancha pul «riskda» ekanini tushunib, uni yo'qotishga tayyor bo'lish kerak — jarayon shunday ishlaydi."},
+  {t:"salbiy", q:"Asimmetrik testda biz qanday holatga intilamiz?",
+   o:["Risk minimal, mukofot cheksiz","Risk katta, mukofot kafolatlangan","Risk va mukofot teng","Umuman risksiz ishlash"], c:0,
+   x:"Ko'p reklama kichik byudjetda yoqiladi, zarar stop'da, g'olib kombinatsiyalar cheksiz masshtablanadi."},
+  {t:"salbiy", q:"Kursga ko'ra, targetda kim yutadi?",
+   o:["O'z raqamlarini biladiganlar","Eng ijodiy fikrlaydiganlar","Eng katta byudjetlilar","Omadi kelganlar"], c:0,
+   x:"Target — jiddiy risk/mukofot o'yini: raqamlarini biladiganlar hammasini qo'lga kiritadi."},
+  {t:"salbiy", q:"Kunlik natijalar va salbiy qayerda nazorat qilinadi?",
+   o:["«Pullik jalb qilish metrikalari» jadvalida","Instagram statistikasida","Bank ilovasida","Telegram kanalda"], c:0,
+   x:"Har kuni raqamlar Pullik jalb qilish metrikalari qo'llanmasiga tushiriladi."},
+
+  /* ——— KPI metrikalar (12) ——— */
+  {t:"kpi", q:"Reklamani ko'rib, telefon raqamini qoldirgan — lekin hali sotib olmagan odam kim?",
+   o:["Lead (Lid)","Mijoz","Auditoriya","Obunachi"], c:0,
+   x:"Lead — qiziqish bildirib kontaktini qoldirgan potensial mijoz. Biznesning yuragi."},
+  {t:"kpi", q:"Targetologning asosiy vazifasi nima?",
+   o:["Sifatli lidlarni ko'proq va arzonroq olib kelish","Chiroyli dizayn yasash","Ko'proq like yig'ish","Sotuvni o'zi yakunlash"], c:0,
+   x:"90% target reklamaning maqsadi — sifatli Lid'larni ko'proq va arzonroq olib kelish."},
+  {t:"kpi", q:"«Lid bo'lmasa, zo'r sotuvchidan foyda yo'q. Lid ko'p bo'lsa…» — davomi qanday?",
+   o:["O'rta sotuvchi ham sota oladi","Sotuvchi kerak bo'lmaydi","Narxni oshirish kerak","Reklamani o'chirish mumkin"], c:0,
+   x:"Lead biznesning yuragidir: lid ko'p bo'lsa, o'rta sotuvchi ham sota oladi."},
+  {t:"kpi", q:"Hisoblang: targetga $10,000, boshqa xarajatlarga $10,000 ketdi. Sotuvlar — $50,000. ROI qancha?",
+   o:["150%","250%","400%","50%"], c:0,
+   x:"Foyda = 50,000 − 10,000 − 10,000 = $30,000. ROI = 30,000 / 20,000 × 100 = 150%."},
+  {t:"kpi", q:"ROAS nimani o'lchaydi?",
+   o:["Reklamaga sarflangan har $1 necha karra qaytganini","Umumiy oylik daromadni","Lidlar sonini","Reklama ko'rsatuvlar sonini"], c:0,
+   x:"ROAS (Return On Ad Spend) = Reklamadan bo'lgan sotuvlar / Reklamaga tikilgan sarmoya."},
+  {t:"kpi", q:"Hisoblang: $5,000 sarflab $25,000 sotuv qilindi. ROAS qancha?",
+   o:["5","0.2","2.5","20"], c:0,
+   x:"ROAS = 25,000 / 5,000 = 5. Har $1 → $5 bo'lib qaytdi."},
+  {t:"kpi", q:"Marja 0.65 bo'lsa, Break-even ROAS qancha?",
+   o:["1.53","0.65","6.5","1.35"], c:0,
+   x:"Break-even ROAS = 1 / Marja = 1 / 0.65 ≈ 1.53."},
+  {t:"kpi", q:"Break-even ROAS = 1.53. Sizning ROAS = 1.2. Biznes qanday ahvolda?",
+   o:["Ziyonda","Foydada","Nol nuqtada","Aniqlab bo'lmaydi"], c:0,
+   x:"ROAS < Break-even bo'lsa — foydadan ko'p sarflanyapti, biznes ziyonda."},
+  {t:"kpi", q:"Hisoblang: $200 sarflab 100 ta lid oldingiz. Bitta lid narxi qancha?",
+   o:["$2","$20","$0.5","$5"], c:0,
+   x:"200 / 100 = $2. Bu CPL — bitta lid narxi."},
+  {t:"kpi", q:"Hisoblang: $100 sarflandi → 50 ta lid → 5 tasi mijoz bo'ldi. CAC qancha?",
+   o:["$20","$2","$50","$10"], c:0,
+   x:"CAC = xarajat / yangi mijozlar = 100 / 5 = $20. Lidga emas, mijozga bo'linadi!"},
+  {t:"kpi", q:"Hisoblang: o'quvchi oyiga $50 to'laydi va 18 oy o'qiydi. LTV qancha?",
+   o:["$900","$50","$450","$1,800"], c:0,
+   x:"LTV = 50 × 18 = $900 — mijoz umri davomida keltiradigan jami pul."},
+  {t:"kpi", q:"Biznes foydali bo'lishi uchun asosiy shart qaysi?",
+   o:["LTV > CAC","CAC > LTV","ROAS < 1","LTV = CAC"], c:0,
+   x:"Mijozdan keladigan pul (LTV) uni jalb qilish xarajatidan (CAC) ko'p bo'lishi shart."},
+
+  /* ——— Ta'qib qilish (8) ——— */
+  {t:"taqib", q:"Odam saytga kirdi, anketa to'ldirmay chiqib ketdi. Keyin internetda unga reklamangiz qayta ko'rinadi. Bu nima?",
+   o:["Re-targeting","A/B test","Lookalike","Masshtablash"], c:0,
+   x:"Re-targeting — potensial mijozni ta'qib qilib, qaytarish va haqiqiy mijozga aylantirish."},
+  {t:"taqib", q:"Nega umuman re-targeting kerak?",
+   o:["Ko'pchilik biz kutgan «ideal yo'l»dan birinchi urinishda yurmaydi","Facebook shuni majburlaydi","Yangi auditoriya qimmat emas","Bu shunchaki moda"], c:0,
+   x:"Biz ideal yo'lni ishlab chiqamiz, ammo ko'pchilik u bo'ylab yurmaydi — ularni qaytarish kerak."},
+  {t:"taqib", q:"Voronkamizdagi «Favqulodda vaziyat #1» qaysi?",
+   o:["LPga kirdi, anketa to'ldirmadi","Anketaga o'tdi, lekin to'ldirmadi","Reklamani ko'rdi, bosmay o'tdi","CRMga tushmadi"], c:0,
+   x:"#1 — LPga kirdi, anketa to'ldirmadi. #2 — Anketaga o'tdi, lekin to'ldirmadi."},
+  {t:"taqib", q:"Ta'qib uchun «Maxsus auditoriyalar» qayerda yaratiladi?",
+   o:["business.facebook.com → Аудитории","Instagram sozlamalarida","Google Analytics'da","CRM tizimida"], c:0,
+   x:"Все инструменты → Аудитории → Создать пользовательскую аудиторию."},
+  {t:"taqib", q:"Re-target auditoriya shakllanishi uchun odatda kamida nechta odam kerak?",
+   o:["500+","50","5,000+","100"], c:0,
+   x:"Auditoriya ma'lumot to'plab shakllanishi uchun vaqt va odatda 500+ odam kerak."},
+  {t:"taqib", q:"Nega auditoriyalar re-target reklamadan ancha OLDIN yaratib qo'yiladi?",
+   o:["Ma'lumot to'plab, shakllanishi uchun vaqt kerak","Facebook shunda chegirma beradi","Ular 24 soatda o'chib ketadi","Bu ixtiyoriy qadam"], c:0,
+   x:"Auditoriya ma'lumot to'plashi kerak — shuning uchun oldindan yaratib qo'yamiz, reklamani keyinroq yoqamiz."},
+  {t:"taqib", q:"Re-targeting yoqilgach sizda nechta yangi kampaniya, guruh va e'lon bo'lishi kerak edi?",
+   o:["1 kampaniya, 2 guruh, 8 e'lon","2 kampaniya, 4 guruh, 16 e'lon","1 kampaniya, 1 guruh, 4 e'lon","3 kampaniya, 3 guruh, 9 e'lon"], c:0,
+   x:"«Retargeting» nomli 1 ta Lead kampaniya, ikki favqulodda vaziyat uchun 2 guruh, 8 e'lon."},
+  {t:"taqib", q:"Auditoriya re-targetga tayyorligini qanday bilamiz?",
+   o:["Yashil rang yonib, «Готово» deb yozilgan bo'ladi","Facebook'dan SMS keladi","Reklama o'zi avtomatik yonadi","Auditoriya nomi qizarib turadi"], c:0,
+   x:"Аудитории bo'limida ikkala auditoriyada yashil rang va «Готово» yozuvi bo'lishi shart."},
+
+  /* ——— Kunlik faoliyat (10) ——— */
+  {t:"kunlik", q:"Hammasini birdan o'zgartirdingiz — endi nima ishlaganini aniqlab bo'lmaydi. Bu holat nima deyiladi?",
+   o:["Gordiy tuguni","Kvant ong","Qizil oqqush","Break-even"], c:0,
+   x:"Gordiy tuguni — sabab-oqibat aloqasi yo'qolgan holat. Yagona chiqish: hammasini o'chirib, boshidan boshlash."},
+  {t:"kunlik", q:"Gordiy tugunini oldini olish uchun testda bir vaqtda nechta variatsiya o'zgartiriladi?",
+   o:["Faqat bitta","Ikkitagacha","Uchta","Cheklov yo'q"], c:0,
+   x:"Faqat bitta (auditoriya YOKI xabar YOKI video). Aks holda oqibat sababini topolmaysiz."},
+  {t:"kunlik", q:"Tahliliy va ijodiy fikrlashni bir vaqtda uyg'unlashtirish kursda nima deb ataladi?",
+   o:["Kvant ong","Gordiy tuguni","Antimo'rt fikr","Asimmetrik test"], c:0,
+   x:"Muammoni tahlil bilan aniqlaysiz, yechimni ijod bilan topasiz — bu «kvant ong»."},
+  {t:"kunlik", q:"Ertalabki check-list qachon va qaysi ma'lumot bilan bajariladi?",
+   o:["Har kuni 08:00–10:00 da, kechagi ma'lumot bilan","Kechqurun, bugungi ma'lumot bilan","Haftada bir, dushanba kuni","Oy oxirida bir marta"], c:0,
+   x:"Har kuni ertalab kechagi raqamlar «Pullik jalb qilish metrikasi» jadvaliga yoziladi."},
+  {t:"kunlik", q:"Yangi reklama yoqildi, «tiriklik alomatlari» bor. Necha kun unga tegmaysiz?",
+   o:["4 kun","1 kun","7 kun","14 kun"], c:0,
+   x:"Algoritm optimizatsiyasi uchun 4 kun kerak. Tekshirasiz, lekin xulosa qilmaysiz va o'zgartirmaysiz."},
+  {t:"kunlik", q:"To'rt kun ichida Ads manager'da nima qilish MUMKIN?",
+   o:["Har 12–24 soatda ishlayotganini tekshirish, lekin o'zgartirmaslik","Byudjetni oshirib turish","Yomon guruhlarni darhol o'chirish","Yangi e'lonlar qo'shish"], c:0,
+   x:"Tekshirib turasiz (aktivmi, byudjet sarflanyaptimi), ammo xulosa qilmaysiz va hech narsani o'zgartirmaysiz."},
+  {t:"kunlik", q:"Nega aynan 5-kun «Xulosa kuni» deb ataladi?",
+   o:["4 kunlik o'rtacha raqamlar bilan oqqushlarning asl yuzi aniqlanadi","Facebook shu kuni hisobot yuboradi","5-kuni byudjet tugaydi","Shu kuni yangi kampaniya yaratiladi"], c:0,
+   x:"Bir kun yaxshi, bir kun yomon bo'lishi mumkin — 4 kunda raqamlar o'rtachaga qaytadi. 4 kundan oldingi xulosa — xulosa emas."},
+  {t:"kunlik", q:"KPI'larni o'lchashning to'g'ri ierarxiyasi (tepadan pastga) qaysi?",
+   o:["ROI → So'rovnoma anketasi → Foydali video","Foydali video → So'rovnoma → ROI","CTR → CPM → CPC","Like → Izoh → Ulashish"], c:0,
+   x:"Agar ROI KPI doirasida bo'lsa — boshqa hech narsaning ahamiyati yo'q. Quyi KPI'lar yuqoridagiga ta'sir qiladi."},
+  {t:"kunlik", q:"Ishlagan (ko'k oqqush) guruhni nusxalaganda nimani o'zgartiramiz?",
+   o:["Yoshni yoki byudjetni atigi 1 ga","Hamma narsani birdan","Hech narsani","Faqat rasmni"], c:0,
+   x:"Sog'lom guruh nusxalanadi va yangi nusxada yosh yoki byudjet atigi 1 ga o'zgartiriladi."},
+  {t:"kunlik", q:"Muvaffaqiyatli kampaniyada «test» qachon tugaydi?",
+   o:["Hech qachon — u doimiy jarayon","Birinchi sotuvdan keyin","Byudjet tugaganda","Bir oydan keyin"], c:0,
+   x:"Test hech qachon tugamaydi: u masshtablash va boshqaruv bilan parallel davom etadi."},
+
+  /* ——— Boshlang'ich holatni boshqarish (12) ——— */
+  {t:"boshqaruv", q:"Reklamani yoqqaningizdan so'ng qanday ko'rsatkichlar orqali «tiriklik alomati» borligiga ishonch hosil qilasiz?",
+   o:["Охват, Показ, Клики","Faqat like va izohlar soni","Faqat CPM ko'rsatkichi","Faqat kunlik byudjet"], c:0,
+   x:"Reklama faolligini Охват (qamrov), Показ (ko'rsatilish) va Клики (bosishlar) orqali tekshirasiz."},
+  {t:"boshqaruv", q:"To'rt kun tegmaslik davrida necha soatda bir marta Ads manager'ga kirib tekshirish tavsiya etiladi?",
+   o:["Har 12–24 soatda","Har 5 daqiqada","Kuniga bir marta, kechqurun","Haftada bir marta"], c:0,
+   x:"Har 12–24 soatda kirib, reklama aktivligini va byudjet sarfini tekshirasiz, lekin xulosa qilmaysiz va hech narsani o'zgartirmaysiz."},
+  {t:"boshqaruv", q:"Agar to'rt kun ichida reklamaga o'zgartirish kiritsangiz, nima yuz beradi?",
+   o:["Boshlagan tadqiqot buziladi va qaytadan boshlashga to'g'ri keladi","Hech narsa o'zgarmaydi","Facebook bonus beradi","Byudjet avtomatik ko'payadi"], c:0,
+   x:"To'rt kun ichida o'zgartirish tadqiqotni izdan chiqaradi, xulosangiz noto'g'ri bo'ladi va qaytadan boshlashga to'g'ri keladi."},
+  {t:"boshqaruv", q:"Xulosa kunida Ads manager'da ma'lumotlarni qaysi davr bo'yicha ko'rib chiqasiz?",
+   o:["Oxirgi 4 kunlik natijalar","Faqat bugungi kun","Oxirgi 30 kun","Kampaniya boshidan hozirgacha"], c:0,
+   x:"Xulosa kunida Ads manager'da oxirgi 4 kunlik natijalar belgilanadi va shu asosda tahlil qilinadi."},
+  {t:"boshqaruv", q:"Xulosa kunida reklama guruhlari qaysi ko'rsatkich bo'yicha tartiblanadi?",
+   o:["Eng arzon video ko'rish (yoki so'rovnoma) narxi bo'yicha","Faqat like soni bo'yicha","Alifbo tartibida","Yaratilgan sanasi bo'yicha"], c:0,
+   x:"Guruhlar eng arzon video ko'rish/so'rovnoma narxi bo'yicha tartiblanadi — shunda qaysi kombinatsiya samarali ekani ko'rinadi."},
+  {t:"boshqaruv", q:"CPL KPI doirasidan tashqarida bo'lgan reklama guruhlariga nima qilinadi?",
+   o:["O'chiriladi","Byudjeti oshiriladi","O'zgartirmasdan qoldiriladi","Auditoriyasi kengaytiriladi"], c:0,
+   x:"KPI doirasidan chetga chiqqan (qizil oqqush) guruhlar o'chiriladi, faqat samarali guruhlar qoladi."},
+  {t:"boshqaruv", q:"Xulosa kunidan so'ng ko'k oqqushlar qancha kam qolsa, bu nimani anglatadi?",
+   o:["Boshlang'ich gipoteza shunchalik noaniq bo'lgan","Byudjet yetarli emasligini","Facebook algoritmi xato ishlayotganini","Reklama juda yaxshi ishlayotganini"], c:0,
+   x:"Ko'k oqqushlar qancha kam bo'lsa, auditoriya/xabar/kreativ bo'yicha boshlang'ich gipoteza shunchalik noaniq bo'lgan degani."},
+  {t:"boshqaruv", q:"Xulosa kunidan keyin sizda 2 ta reklama matni (kreativ) qolgan bo'lsa, keyingi qadam qanday?",
+   o:["Yangi reklama video/matni bilan test uchun yangi guruh yaratiladi","Ikkalasi ham o'chiriladi","Byudjet ikkiga bo'linadi","Auditoriya o'zgartiriladi, matn qoladi"], c:0,
+   x:"Kam qolgan kreativlar o'rniga yangi video/matn bilan yangi test guruhi yaratiladi."},
+  {t:"boshqaruv", q:"Xulosa kunidan keyin sizda faqat 1 ta auditoriya qolgan bo'lsa, nima qilinadi?",
+   o:["Yaxshi ishlagan xabar bilan yangi auditoriya test qilinadi","Auditoriya kengaytirilmaydi","Kampaniya to'xtatiladi","Byudjet 2 barobar oshiriladi"], c:0,
+   x:"Yaxshi natija bergan xabar saqlanib, unga yangi auditoriya biriktirilib test qilinadi."},
+  {t:"boshqaruv", q:"Ads manager'da doimiy ravishda amalga oshiriladigan jarayon qanday ta'riflanadi?",
+   o:["Qizil oqqushlarni o'ldirish va ko'k oqqushlarni ko'paytirish","Faqat yangi kampaniya yaratish","Byudjetni har hafta yarmiga tushirish","Auditoriyalarni birlashtirish"], c:0,
+   x:"Bu — samarasiz guruhlarni o'chirib, samarali guruhlarni ko'paytirish jarayoni, doimiy davom etadi."},
+  {t:"boshqaruv", q:"Hozirgi kampaniya natijalari yaxshi bo'lsa ham, nega yangi variatsiyalarni test qilish uchun byudjet ajratish kerak?",
+   o:["Reklamalar uzoq muddat ishlashi va natija berishi uchun","Facebook shuni talab qiladi","Yangi variatsiyalar har doim arzonroq bo'ladi","Eski guruhlar tez charchaydi"], c:0,
+   x:"Uzoq muddatli barqaror natija uchun doimiy ravishda yangi variatsiyalar test qilinishi kerak."},
+  {t:"boshqaruv", q:"«Pullik jalb qilish» jadvalida qaysi ko'rsatkichlarni siz o'zingiz qo'lda kiritasiz?",
+   o:["Calls, Sales #, Sales $","CPM, CTR, CPC","VCR, CPS, QCR","CPA, P/L, ROI"], c:0,
+   x:"Adspend, Impressions, Clicks, Leads, Surveys — Ads manager'dan olinadi; CPM/CTR/CPC/VCR/CPS/QCR/CPA/P-L/ROI'ni jadval o'zi hisoblaydi; Calls va Sales ma'lumotlarini esa o'zingiz kiritasiz."}
+];
+
+var PASS = 80, RETRY = 50;
+var EXAM_SIZE = 40, TIME_PER_Q = 90;
+var order = [], idx = 0, answers = [], picked = null, studentName = "", photoData = null;
+var qTimerInterval = null, qTimeLeft = 0, qLocked = false, currentDocRef = null;
+function $(id){return document.getElementById(id);}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function hasStorage(){ return !!db; }
+
+/* ——— savol bo'yicha 90 soniyalik teskari sanoq ——— */
+function clearQTimer(){
+  if(qTimerInterval){ clearInterval(qTimerInterval); qTimerInterval = null; }
+}
+function startQTimer(){
+  clearQTimer();
+  qTimeLeft = TIME_PER_Q;
+  updateTimerUI();
+  qTimerInterval = setInterval(function(){
+    qTimeLeft--;
+    updateTimerUI();
+    if(qTimeLeft <= 0){
+      clearQTimer();
+      handleTimeout();
+    }
+  }, 1000);
+}
+function updateTimerUI(){
+  var num = $('qTimerNum'), box = $('qTimer');
+  if(!num || !box) return;
+  num.textContent = qTimeLeft;
+  if(qTimeLeft <= 15){ box.classList.add('warn'); } else { box.classList.remove('warn'); }
+}
+function lockOptions(){
+  var box = $('qOpts');
+  var all = box.querySelectorAll('.opt');
+  for(var i=0;i<all.length;i++){ all[i].style.pointerEvents = 'none'; all[i].style.opacity = '.5'; }
+  $('nextBtn').disabled = true;
+}
+function handleTimeout(){
+  if(qLocked) return;
+  qLocked = true;
+  lockOptions();
+  var box = $('qOpts');
+  var banner = document.createElement('div');
+  banner.id = 'timeoutMsg';
+  banner.style.cssText = "margin-top:14px;padding:13px 16px;border-radius:10px;background:rgba(228,87,61,.12);border:1px solid rgba(228,87,61,.4);color:#F08A76;font-size:.85rem;font-weight:700;line-height:1.5;";
+  banner.textContent = "⏱ Vaqt tugadi — javob berilmagan deb hisoblanadi. Keyingi savolga o'tilmoqda…";
+  box.parentNode.insertBefore(banner, box.nextSibling);
+  setTimeout(function(){
+    answers.push({ ref: order[idx].ref, picked: null, timedOut: true });
+    idx++;
+    if(idx >= order.length){ finish(); } else { renderQ(); }
+  }, 1600);
+}
+
+/* ——— kamera ——— */
+var camStream = null;
+$('camOn').addEventListener('click', startCam);
+$('camSnap').addEventListener('click', snap);
+$('camRetake').addEventListener('click', retake);
+
+function startCam(){
+  var st = $('camStatus');
+  st.className = "status"; st.textContent = "Kamera so'ralmoqda…";
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    st.className = "status err";
+    st.textContent = "Bu qurilmada kamera ochilmadi. Telefon/kompyuter brauzerida oching yoki ustozga xabar bering.";
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{width:480,height:360,facingMode:"user"},audio:false})
+  .then(function(stream){
+    camStream = stream;
+    var v = $('camVideo');
+    v.srcObject = stream;
+    v.classList.remove('hidden');
+    $('camIdle').classList.add('hidden');
+    $('camShot').classList.add('hidden');
+    $('camOn').classList.add('hidden');
+    $('camSnap').classList.remove('hidden');
+    $('camRetake').classList.add('hidden');
+    st.textContent = "Yuzingizni ramkaga joylang va rasmga oling.";
+  })
+  .catch(function(err){
+    st.className = "status err";
+    st.textContent = "Kameraga ruxsat berilmadi. Brauzer sozlamalaridan kameraga ruxsat bering va qayta urining.";
+  });
+}
+
+function snap(){
+  var v = $('camVideo');
+  var c = document.createElement('canvas');
+  c.width = 240; c.height = 180;
+  c.getContext('2d').drawImage(v, 0, 0, 240, 180);
+  photoData = c.toDataURL('image/jpeg', 0.6);
+  $('camShot').src = photoData;
+  $('camShot').classList.remove('hidden');
+  v.classList.add('hidden');
+  stopCam();
+  $('camSnap').classList.add('hidden');
+  $('camRetake').classList.remove('hidden');
+  var st = $('camStatus');
+  st.className = "status ok"; st.textContent = "✓ Rasm olindi";
+  checkReady();
+}
+
+function retake(){
+  photoData = null;
+  $('camShot').classList.add('hidden');
+  checkReady();
+  startCam();
+}
+
+function stopCam(){
+  if(camStream){ camStream.getTracks().forEach(function(t){t.stop();}); camStream = null; }
+}
+
+function checkReady(){
+  var nameOk = $('name').value.trim().length >= 2;
+  $('startBtn').disabled = !(nameOk && photoData);
+}
+$('name').addEventListener('input', checkReady);
+
+/* ——— imtihon ——— */
+var LOCAL_FLAG = "tf_exam_done_v1";
+$('startBtn').addEventListener('click', attemptStart);
+$('nextBtn').addEventListener('click', nextQ);
+$('printBtn').addEventListener('click', function(){window.print();});
+
+function nameKey(name){
+  return (name||"").trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function showStartErr(msg){
+  var box = $('startErr');
+  box.textContent = msg;
+  box.style.display = msg ? "block" : "none";
+}
+
+function attemptStart(){
+  showStartErr("");
+  var btn = $('startBtn');
+
+  if(localStorage.getItem(LOCAL_FLAG)){
+    showStartErr("⚠ Siz bu qurilma/brauzerdan imtihonni allaqachon topshirgansiz. Qayta topshirish faqat o'qituvchi ruxsati bilan mumkin.");
+    return;
+  }
+
+  var nm = $('name').value.trim();
+  var key = nameKey(nm);
+  if(key.length < 2){ return; }
+
+  btn.disabled = true; btn.textContent = "Tekshirilmoqda…";
+
+  if(!hasStorage()){
+    localStorage.setItem(LOCAL_FLAG, "1");
+    studentName = nm;
+    startExam();
+    return;
+  }
+
+  db.collection("results").where("nameKey","==",key).limit(1).get()
+  .then(function(snap){
+    if(!snap.empty){
+      showStartErr("⚠ Bu ism (\""+nm+"\") bilan imtihon allaqachon topshirilgan yoki boshlangan. Bir kishi faqat bir marta kira oladi. Xato bo'lsa yoki qayta topshirish kerak bo'lsa, o'qituvchiga murojaat qiling.");
+      btn.disabled = false; btn.textContent = "Imtihonni boshlash";
+      return null;
+    }
+    /* Joyni darhol band qilib qo'yamiz — shu bilan boshqa qurilmadan qayta kirish imkonsiz bo'ladi,
+       hatto bu odam imtihonni oxirigacha tugatmasa ham. */
+    return db.collection("results").add({
+      name: nm, nameKey: key, status: "started", date: new Date().toISOString()
+    }).then(function(ref){
+      currentDocRef = ref;
+      localStorage.setItem(LOCAL_FLAG, "1");
+      studentName = nm;
+      startExam();
+    });
+  })
+  .catch(function(err){
+    showStartErr("⚠ Tekshirishda xatolik yuz berdi. Internet aloqasini tekshirib, qayta urining.");
+    btn.disabled = false; btn.textContent = "Imtihonni boshlash";
+    console.error(err);
+  });
+}
+
+function startExam(){
+  var pool = shuffle(QUESTIONS.map(function(q,i){
+    return { ref:i, optIdx: shuffle(q.o.map(function(_,j){return j;})) };
+  }));
+  order = pool.slice(0, Math.min(EXAM_SIZE, pool.length));
+  idx = 0; answers = [];
+  $('start').classList.add('hidden');
+  $('quiz').classList.remove('hidden');
+  $('quizName').textContent = studentName;
+  $('qTotal').textContent = order.length;
+  renderQ();
+}
+
+function renderQ(){
+  var item = order[idx], q = QUESTIONS[item.ref];
+  picked = null;
+  qLocked = false;
+  var oldMsg = document.getElementById('timeoutMsg');
+  if(oldMsg) oldMsg.parentNode.removeChild(oldMsg);
+  $('qNow').textContent = idx+1;
+  var pct = (idx/order.length*100);
+  $('barFill').style.width = pct+"%";
+  $('glider').style.left = pct+"%";
+  $('qTopic').textContent = TOPICS[q.t];
+  $('qText').textContent = q.q;
+  $('nextBtn').disabled = true;
+  $('nextBtn').textContent = idx === order.length-1 ? "Imtihonni yakunlash" : "Keyingi savol";
+  var box = $('qOpts'); box.innerHTML = "";
+  var letters = ["A","B","C","D"];
+  item.optIdx.forEach(function(origIdx, shown){
+    var b = document.createElement('button');
+    b.className = "opt"; b.type = "button";
+    b.innerHTML = '<span class="key">'+letters[shown]+'</span><span>'+esc(q.o[origIdx])+'</span>';
+    b.addEventListener('click', function(){
+      if(qLocked) return;
+      picked = origIdx;
+      var all = box.querySelectorAll('.opt');
+      for(var i=0;i<all.length;i++) all[i].classList.remove('sel');
+      b.classList.add('sel');
+      $('nextBtn').disabled = false;
+    });
+    box.appendChild(b);
+  });
+  var card = $('qCard');
+  card.classList.remove('anim'); void card.offsetWidth; card.classList.add('anim');
+  window.scrollTo({top:0,behavior:'smooth'});
+  startQTimer();
+}
+
+function nextQ(){
+  if(qLocked) return;
+  clearQTimer();
+  answers.push({ ref: order[idx].ref, picked: picked, timedOut: false });
+  idx++;
+  if(idx >= order.length){ finish(); } else { renderQ(); }
+}
+
+function finish(){
+  var total = answers.length, correct = 0, timeoutCount = 0;
+  var topicStat = {}; Object.keys(TOPICS).forEach(function(k){topicStat[k]={ok:0,all:0};});
+  var wrong = [];
+  answers.forEach(function(a){
+    var q = QUESTIONS[a.ref];
+    topicStat[q.t].all++;
+    if(a.timedOut) timeoutCount++;
+    if(a.picked === q.c){ correct++; topicStat[q.t].ok++; }
+    else wrong.push(a);
+  });
+  var pct = Math.round(correct/total*100);
+  var tier = pct >= PASS ? "pass" : (pct >= RETRY ? "retry" : "fail");
+
+  $('quiz').classList.add('hidden');
+  var res = $('result');
+  res.classList.remove('hidden'); res.classList.add('anim');
+  $('scoreRaw').textContent = studentName + " · " + correct + " / " + total + " to'g'ri";
+  if(photoData){ $('resPhoto').src = photoData; $('resPhoto').classList.remove('hidden'); }
+
+  var cur = 0, step = Math.max(1, Math.round(pct/40));
+  var cnt = setInterval(function(){
+    cur = Math.min(pct, cur+step);
+    $('scorePct').textContent = cur;
+    if(cur >= pct) clearInterval(cnt);
+  }, 30);
+
+  var tag = $('verdictTag'), vt = $('verdictTitle'), vx = $('verdictText'), sw = $('vSwanPath');
+  if(tier === "pass"){
+    tag.className = "verdict-tag v-pass"; tag.textContent = "Ko'k oqqush";
+    sw.setAttribute('fill','#3D77E0');
+    vt.textContent = "Tabriklaymiz — keyingi modulga o'tdingiz!";
+    vx.textContent = "Raqamlaringizni bilasiz, oqqushingiz omon qoldi. 2-modul mustahkam o'zlashtirildi — 3-modulda ko'rishamiz.";
+  } else if(tier === "retry"){
+    tag.className = "verdict-tag v-retry"; tag.textContent = "Qayta imtihon";
+    sw.setAttribute('fill','#C9A227');
+    vt.textContent = "Yaqin qoldingiz — qayta topshirasiz.";
+    vx.textContent = "Natijangiz 50–79% oralig'ida. Quyidagi xatolar tahlilini ko'rib chiqing, zaif mavzularni qayta o'rganing va imtihonga qaytib keling.";
+  } else {
+    tag.className = "verdict-tag v-fail"; tag.textContent = "Qizil oqqush";
+    sw.setAttribute('fill','#E4573D');
+    vt.textContent = "Afsuski, natija kurs talablariga javob bermaydi.";
+    vx.textContent = "Natijangiz 50% dan past. Kurs qoidalariga ko'ra bu bosqichda davom etib bo'lmaydi. Yakuniy qaror bo'yicha ustozingiz bilan bog'laning.";
+  }
+
+  var br = $('breakRows'); br.innerHTML = "";
+  Object.keys(TOPICS).forEach(function(k){
+    var s = topicStat[k], p = s.all ? Math.round(s.ok/s.all*100) : 0;
+    var row = document.createElement('div');
+    row.className = "brow";
+    row.innerHTML = '<div class="lbl"><span>'+TOPICS[k]+'</span><span>'+s.ok+'/'+s.all+' · '+p+'%</span></div><div class="track"><i data-w="'+p+'"></i></div>';
+    br.appendChild(row);
+  });
+  setTimeout(function(){
+    var bars = br.querySelectorAll('.track i');
+    for(var i=0;i<bars.length;i++) bars[i].style.width = bars[i].getAttribute('data-w')+"%";
+  }, 120);
+
+  var rl = $('reviewList'); rl.innerHTML = "";
+  if(wrong.length === 0){
+    rl.innerHTML = '<p class="allright">Bironta ham xato yo&#39;q — mukammal natija! 🦢</p>';
+  } else {
+    wrong.forEach(function(a){
+      var q = QUESTIONS[a.ref];
+      var d = document.createElement('div');
+      d.className = "ritem";
+      var yourAnswer = a.timedOut ? "⏱ vaqt tugadi — javob berilmadi" : (a.picked===null ? "javob berilmadi" : esc(q.o[a.picked]));
+      d.innerHTML =
+        '<div class="rq">'+esc(q.q)+'</div>'+
+        '<div class="ra wrong">✗ Sizning javobingiz: '+yourAnswer+'</div>'+
+        '<div class="ra right">✓ To&#39;g&#39;ri javob: '+esc(q.o[q.c])+'</div>'+
+        '<div class="rx">'+esc(q.x)+'</div>';
+      rl.appendChild(d);
+    });
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+  saveResult(pct, correct, total, tier, topicStat, timeoutCount);
+}
+
+/* ——— natijani o'qituvchi paneliga yuborish (Firebase Firestore) ——— */
+function saveResult(pct, correct, total, tier, topicStat, timeoutCount){
+  var st = $('saveStat');
+  if(!hasStorage()){
+    st.className = "savestat err";
+    st.textContent = "⚠ Natija avtomatik yuborilmadi (Firebase sozlanmagan). Natija ekranini skrinshot qilib ustozga yuboring.";
+    return;
+  }
+  st.className = "savestat"; st.textContent = "Natija yuborilmoqda…";
+  var rec = {
+    name: studentName,
+    nameKey: nameKey(studentName),
+    pct: pct, correct: correct, total: total, tier: tier,
+    timeoutCount: timeoutCount || 0,
+    status: "completed",
+    date: new Date().toISOString(),
+    photo: photoData,
+    topics: topicStat
+  };
+  var writeOp = currentDocRef
+    ? currentDocRef.set(rec, {merge:true})
+    : db.collection("results").add(rec);
+  writeOp
+  .then(function(){
+    st.className = "savestat ok"; st.textContent = "✓ Natijangiz o'qituvchiga yuborildi";
+  })
+  .catch(function(err){
+    st.className = "savestat err";
+    st.textContent = "⚠ Yuborishda xatolik. Skrinshot qilib ustozga yuboring.";
+    console.error(err);
+  });
+}
+
+/* ——— o'qituvchi paneli ——— */
+$('teacherLink').addEventListener('click', function(){
+  hideAll(); $('tlogin').classList.remove('hidden');
+});
+$('tBack').addEventListener('click', function(){ hideAll(); $('start').classList.remove('hidden'); });
+$('tExit').addEventListener('click', function(){ $('tpin').value=""; hideAll(); $('start').classList.remove('hidden'); });
+$('tEnter').addEventListener('click', tryLogin);
+$('tpin').addEventListener('keydown', function(e){ if(e.key==="Enter") tryLogin(); });
+$('tRefresh').addEventListener('click', loadResults);
+$('tClear').addEventListener('click', clearAll);
+
+function hideAll(){
+  ['start','quiz','result','tlogin','tpanel'].forEach(function(id){$(id).classList.add('hidden');});
+}
+
+function tryLogin(){
+  if($('tpin').value === TEACHER_PIN){
+    hideAll(); $('tpanel').classList.remove('hidden');
+    loadResults();
+  } else {
+    $('tpin').value = "";
+    $('tpin').placeholder = "Noto'g'ri parol!";
+  }
+}
+
+function loadResults(){
+  var list = $('tList'), stats = $('tStats');
+  if(!hasStorage()){
+    list.innerHTML = '<p class="tempty">⚠ Firebase sozlanmagan. Fayl ichidagi <code>firebaseConfig</code> maydonlarini to&#39;ldiring.</p>';
+    stats.innerHTML = "";
+    return;
+  }
+  list.innerHTML = '<p class="tempty">Yuklanmoqda…</p>';
+  db.collection("results").orderBy("date","desc").get()
+  .then(function(snap){
+    var recs = [];
+    snap.forEach(function(doc){
+      var v = doc.data(); v._key = doc.id; recs.push(v);
+    });
+    if(recs.length === 0){
+      list.innerHTML = '<p class="tempty">Hozircha natijalar yo&#39;q. O&#39;quvchilar imtihon topshirgach, shu yerda paydo bo&#39;ladi.</p>';
+      stats.innerHTML = "";
+      return;
+    }
+    renderTeacher(recs);
+  })
+  .catch(function(err){
+    list.innerHTML = '<p class="tempty">Natijalarni yuklashda xatolik: '+esc(err.message||"")+'</p>';
+    stats.innerHTML = "";
+    console.error(err);
+  });
+}
+
+function renderTeacher(recs){
+  var stats = $('tStats'), list = $('tList');
+  var nPass=0, nRetry=0, nFail=0, nStarted=0;
+  recs.forEach(function(r){
+    if(r.status === "started"){ nStarted++; }
+    else if(r.tier==="pass")nPass++; else if(r.tier==="retry")nRetry++; else nFail++;
+  });
+  stats.innerHTML =
+    '<div class="tstat"><div class="n">'+recs.length+'</div><div class="l">Jami yozuv</div></div>'+
+    '<div class="tstat"><div class="n" style="color:#7FA8F0">'+nPass+'</div><div class="l">O&#39;tdi</div></div>'+
+    '<div class="tstat"><div class="n" style="color:#EBD173">'+nRetry+'</div><div class="l">Qayta imtihon</div></div>'+
+    '<div class="tstat"><div class="n" style="color:#F08A76">'+nFail+'</div><div class="l">Yiqildi</div></div>'+
+    (nStarted ? '<div class="tstat"><div class="n" style="color:#A29E96">'+nStarted+'</div><div class="l">Boshlab tashlab ketgan</div></div>' : '');
+  list.innerHTML = "";
+  recs.forEach(function(r){
+    var row = document.createElement('div');
+    row.className = "trow";
+    var d = r.date ? new Date(r.date) : null;
+    var ds = d ? d.toLocaleDateString('uz-UZ') + " " + d.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'}) : "—";
+
+    if(r.status === "started"){
+      row.innerHTML =
+        '<div class="nophoto">boshlangan</div>'+
+        '<div class="info"><div class="nm">'+esc(r.name||"Noma'lum")+'</div><div class="dt">'+ds+' · imtihonni boshlagan, lekin tugatmagan</div></div>'+
+        '<span class="vt" style="background:rgba(162,158,150,.15);color:#A29E96;border:1px solid rgba(162,158,150,.4)">Tugallanmagan</span>'+
+        '<div class="pc">—</div>';
+      var del0 = document.createElement('button');
+      del0.className = "btn btn-danger btn-sm";
+      del0.textContent = "O'chirish (qayta kirishga ruxsat)";
+      del0.addEventListener('click', function(){
+        if(!confirm(r.name + " uchun band qilingan joyni o'chirasizmi? Shundan so'ng u ismi bilan qayta kira oladi (agar shu qurilmadan kirsa, avval localStorage ham tozalanishi kerak).")) return;
+        db.collection("results").doc(r._key).delete().then(loadResults).catch(loadResults);
+      });
+      row.appendChild(del0);
+      list.appendChild(row);
+      return;
+    }
+
+    var vtCls = r.tier==="pass" ? "v-pass" : (r.tier==="retry" ? "v-retry" : "v-fail");
+    var vtTxt = r.tier==="pass" ? "O'tdi" : (r.tier==="retry" ? "Qayta" : "Yiqildi");
+    var photoHtml = r.photo ? '<img src="'+r.photo+'" alt="">' : '<div class="nophoto">rasm yo&#39;q</div>';
+    var toHtml = r.timeoutCount ? ' · ⏱ '+r.timeoutCount+' ta vaqt tugagan' : '';
+    row.innerHTML =
+      photoHtml+
+      '<div class="info"><div class="nm">'+esc(r.name||"Noma'lum")+'</div><div class="dt">'+ds+' · '+r.correct+'/'+r.total+' to&#39;g&#39;ri'+toHtml+'</div></div>'+
+      '<span class="vt '+vtCls+'">'+vtTxt+'</span>'+
+      '<div class="pc">'+r.pct+'%</div>';
+    var del = document.createElement('button');
+    del.className = "btn btn-danger btn-sm";
+    del.textContent = "O'chirish (qayta topshirishga ruxsat)";
+    del.addEventListener('click', function(){
+      if(!confirm(r.name + " natijasini o'chirasizmi? Shundan so'ng u ismi bilan qayta imtihon topshira oladi (agar shu qurilmadan kirsa, avval localStorage ham tozalanishi kerak).")) return;
+      db.collection("results").doc(r._key).delete().then(loadResults).catch(loadResults);
+    });
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+function clearAll(){
+  if(!hasStorage()) return;
+  if(!confirm("DIQQAT: barcha o'quvchilar natijalari butunlay o'chiriladi. Davom etasizmi?")) return;
+  db.collection("results").get().then(function(snap){
+    var batch = db.batch();
+    snap.forEach(function(doc){ batch.delete(doc.ref); });
+    return batch.commit();
+  }).then(loadResults).catch(loadResults);
+}
+</script>
+</body>
+</html>
